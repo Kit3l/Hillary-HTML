@@ -1,0 +1,31 @@
+import requests
+import datetime
+import schedule
+import time
+
+def check_international_day():
+    # Get the list of international days from the UN website
+    response = requests.get("https://www.un.org/en/observances/international-days")
+
+    # Extract the list of international days from the response
+    days = response.json()["data"]
+
+    # Get the current date
+    current_date = datetime.datetime.now()
+
+    # Check if today is an international day
+    for day in days:
+        date_parts = day["date"].split("-")
+        international_day = datetime.datetime(int(date_parts[0]), int(date_parts[1]), int(date_parts[2]))
+        if current_date.date() == international_day.date():
+            print("Today is " + day["name"] + "!")
+            break
+    else:
+        print("Today is not an international day.")
+
+# Schedule the check_international_day function to run every day at 8:00 AM
+schedule.every().day.at("8:00").do(check_international_day)
+
+while True:
+    schedule.run_pending()
+    time.sleep(1)
